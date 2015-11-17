@@ -20,7 +20,7 @@ Add Digitalocean access token. Token will be saved as enviroment  variable.
 
 List all droplet's name, id, image, status,region.
 
--rr, --resetroot
+-rr RESETROOT, --resetroot RESETROOT
 
 Reset root password
 

@@ -35,7 +35,7 @@ class DigOcean(object):
         self.parser = argparse.ArgumentParser(description="Manage Digitalocean droplets", prog="digitalocean-tk")
         self.parser.add_argument("-t", "--token", action='store_true', help="Add Digitalocean access token")
         self.parser.add_argument("-l", "--listdroplets", action='store_true', help="List all droplet's name, id, image, status,region.")
-        self.parser.add_argument("-rr", "--resetroot", action='store_true', help="Reset root password")
+        self.parser.add_argument("-rr", "--resetroot", help="Reset root password - Use \"\" if multiple droplets.")
         
         self.parser.add_argument("-S", "--snapshot", help="Take snapshot of droplet(s) - Give droplet id(s) to snapshot. Use \"\" if multiple droplets. Give \"all\" instead of id(s) to perform on all droplets")
         self.parser.add_argument("-R", "--restore", help="Restore droplet from image - Give droplet id. Image id will be asked.")
