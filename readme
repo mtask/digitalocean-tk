@@ -1,3 +1,5 @@
+Depencies: pip install -U python-digitalocean
+
 usage: digitalocean-tk [-h] [-t] [-l] [-rr] [-S SNAPSHOT] [-R RESTORE]
                        
                        [-s SHUTDOWN] [-p POWERON] [-r REBOOT] [-d DELETE]
