@@ -1,18 +1,18 @@
 ##digitalocean-tk
 
-Toolkit for managing DigitalOcean's Virtual Private servers, also known as Droplets.
+Toolkit for managing Digital Ocean's Virtual Private servers, also known as Droplets.
 
 Tested with Python2.7 on Debian.	
 
 ###Features:
 
- - List all your Droplets with name, id, region, image and status info. 
+ -List all your Droplets with name, id, region, image and status info. 
  
- - Reset Droplets root password.
+ -Reset Droplets root password.
  
- - Powermanaging: Turn on/off and reboot Droplets.
+ -Powermanaging: Turn on/off and reboot Droplets.
  
- - Take and restore snapshots. 
+ -Take and restore snapshots. 
 
 ###Depencies:
 
