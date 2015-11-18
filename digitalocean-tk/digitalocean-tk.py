@@ -6,7 +6,7 @@ import os, argparse, sys, digitalocean, time, re
 Author: mtask@github.com
 Program: digitalocean-tk.py
 
-Toolkit for managing DigitalOcean's Droplets.
+Toolkit for managing Digital Ocean's Droplets.
 '''
 
 class DigOcean(object):
