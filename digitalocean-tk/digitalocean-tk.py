@@ -1,8 +1,12 @@
+#!/usr/bin/python2
+
 import os, argparse, sys, digitalocean, time, re
 
 '''
 Author: mtask@github.com
-Program: vpsclient.py
+Program: digitalocean-tk.py
+
+Toolkit for managing DigitalOcean's Droplets.
 '''
 
 class DigOcean(object):
@@ -67,22 +71,27 @@ class DigOcean(object):
         #########################################################
         #Set api's acces token as enviroment variable to .bashrc#
         #########################################################
-
-         while True:
-             self.userName = self.get_input("Give local username: ")
-             if self.userName == "root":
-                 self.bashrcLocation = "/root/.bashrc"
-             else:   
-                 self.bashrcLocation = "/home/"+self.userName+"/.bashrc"
-             try:
-                 with open(self.bashrcLocation, "a") as brc:
-                     self.apiToken = self.get_input("Give Digital Ocean access token: ")
-                     brc.write('export DOTOKEN="'+self.apiToken+'"')
-                 print(self.warn+"Re-open terminal/reload .bashrc"+self.blk)
-                 break
-             except Exception as e:
-                 print(e)
-                 continue
+        self.apiToken = self.get_input("Give Digital Ocean access token: ")
+        if os.name == 'posix':
+            while True:
+                self.userName = self.get_input("Give local username: ")
+                if self.userName == "root":
+                    self.bashrcLocation = "/root/.bashrc"
+                else:   
+                    self.bashrcLocation = "/home/"+self.userName+"/.bashrc"
+                try:
+                    with open(self.bashrcLocation, "a") as brc:
+                        brc.write('export DOTOKEN="'+self.apiToken+'"')
+                    print(self.warn+"Re-open terminal/reload .bashrc"+self.blk)
+                    break
+                except Exception as e:
+                    print(e)
+                    continue
+        
+        elif os.name == 'nt':
+            os.system("setx DOTOKEN "+self.apiToken)
+        else:
+            print(self.warn+"[!] Your operating system is not supported".self.blk)
                  
     def listDroplets(self):
          ##################
@@ -93,16 +102,19 @@ class DigOcean(object):
          print("Loading droplets")
          print("Your droplets")
          print(self.grn+"--------------------")
-         for self.droplet in self.droplets:
-             print(self.warn+"Name/ID: "+self.grn+self.droplet.name+"/"+str(self.droplet.id))
-             print(self.warn+"Image: "+self.grn+self.droplet.image['slug'])
+         try:
+             for self.droplet in self.droplets:
+                 print(self.warn+"Name/ID: "+self.grn+str(self.droplet.name)+"/"+str(self.droplet.id))
+                 print(self.warn+"Image: "+self.grn+str(self.droplet.image['slug']))
              
-             print(self.warn+"Status: "+self.grn+self.droplet.status)
-             print(self.warn+"Region: "+self.grn+self.droplet.region['name'])
-             print("-------------------------")
+                 print(self.warn+"Status: "+self.grn+str(self.droplet.status))
+                 print(self.warn+"Region: "+self.grn+str(self.droplet.region['name']))
+                 print("-------------------------")
              
-         print(""+self.blk)
-         return
+             print(""+self.blk)
+             return
+         except Exception as e:
+            print(e)
     
     def takeSnapshot(self,droplet):
         ################
@@ -181,7 +193,7 @@ class DigOcean(object):
         
     def deleteDroplet(self, dropletIDs):
         ###################
-        #Delete droplet(a)#
+        #Delete droplet(s)#
         ###################
         
         self.dIDs = dropletIDs
@@ -243,18 +255,19 @@ class DigOcean(object):
              self.args = self.arguments()
          #Set access token for Digitalocean api
          #Token is set in .bashrc as enviroment variable 
-         #Bash shell needs to be restarted or .bashrc reloaded after setting token
+         #On Linux Bash shell needs to be restarted or .bashrc reloaded after setting token
          if self.args.token:
              self.setToken()
              return
          
-         #Load access token
          try:
+             #Load access token
              self.doToken = os.environ['DOTOKEN']  
          except KeyError:
-             print(self.fatal+"[!] No access token found."
-                  +self.warn+"\nUse -t option to set token."
-                  +"\nIf token is already set try to run \"source ~/.bashrc\""+self.blk)
+             #If acceess token isn't found
+             print(self.fatal+"[!] No access token found."+self.warn+"\nUse -t option to set token.")
+             if os.name == 'posix':
+                 print("\nIf token is already set try to run \"source ~/.bashrc\""+self.blk)
              if customArgs:
                  return
              else:

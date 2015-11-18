@@ -1,6 +1,34 @@
-Depencies: pip install -U python-digitalocean
+##digitalocean-tk
 
-usage: digitalocean-tk [-h] [-t] [-l] [-rr] [-S SNAPSHOT] [-R RESTORE]
+Toolkit for managing DigitalOcean's Virtual Private servers, also known as Droplets.
+
+Tested with Python2.7 on Debian.	
+
+###Features:
+
+ - List all your Droplets with name, id, region, image and status info. 
+ 
+ - Reset Droplets root password.
+ 
+ - Powermanaging: Turn on/off and reboot Droplets.
+ 
+ - Take and restore snapshots. 
+
+###Depencies:
+
+pip install -U python-digitalocean
+
+###First run:
+
+DigitalOceans access token needs to be set before other features come available.
+
+Check "-t/--token" option below.
+
+Access token is saved as enviroment variable and digitalocean-tk retrieves it from there.
+
+###usage:
+
+digitalocean-tk [-h] [-t] [-l] [-rr] [-S SNAPSHOT] [-R RESTORE]
                        
                        [-s SHUTDOWN] [-p POWERON] [-r REBOOT] [-d DELETE]
                        
