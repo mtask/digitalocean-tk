@@ -1,4 +1,4 @@
-import os, requests, argparse, sys, digitalocean, time, re
+import os, argparse, sys, digitalocean, time, re
 
 '''
 Author: mtask@github.com
@@ -111,26 +111,54 @@ class DigOcean(object):
         print(self.warn+"Taking snapshot"+self.blk)
         try:
             self.droplet = self.manager.get_droplet(droplet)
-            self.date_raw = str(time.strftime("%x"))
-            self.snapshotName = "testi"
+            self.date = re.sub('[/]', '_',str(time.strftime("%x")))
+            self.snapshotName = self.date
             self.droplet.take_snapshot(self.snapshotName,return_dict=False).wait()
             return True
         except Exception as e:
             print(e)
            
     def restoreImage(self, dropletid):
-        ################
-        #Take snapshot#
-        ################
-        print(self.warn+"Taking snapshot"+self.blk)
+        ############################
+        #Restore snapshot or backup#
+        ############################
+        self.images_dict = {}
+        self.img_num = 1
+        self.img_choice = None
+        
         try:
-            
+            self.images = self.manager.get_my_images()
             self.droplet = self.manager.get_droplet(dropletid)
-            print("Restoring droplet from snapshot")
+            print("Image number : Image info")
+            for self.img in self.images:
+                self.images_dict[str(self.img_num)] = str(self.img).split()[0]
+                print(self.warn+str(self.img_num)+": "+self.grn+str(self.img)+self.blk)
+                self.img_num += 1
             
-  
-  #self.droplet.restore(self.snapshotName,return_dict=False).wait()
-            return True
+            while not self.img_choice:
+                print("Give number of image which to use for restoring droplet: "+str(self.droplet))
+                try:
+                    self.img_choice = int(self.get_input("Number> "))
+                except ValueError:
+                    print(self.warn+"[!] Not valid choice: "+str(self.img_choice)+self.blk)
+                    self.img_choice = None
+                else:
+                    if (self.img_choice > 0 and self.img_choice <= len(self.images_dict)):
+                        self.image = self.images_dict[str(self.img_choice)]
+                        print(self.warn+"Restoring  "+str(self.droplet.name)+" from image "+self.images_dict[str(self.img_choice)]+self.blk)
+                        print(self.warn+"This might take a while.."+self.blk)
+                        self.droplet.restore(self.image,return_dict=False).wait()
+                        self.actions = self.droplet.get_actions()
+                        self.progress = self.actions[0].status
+                        if self.progress == "completed":
+                            return True
+                        else:
+                            print(self.actions[0])
+                        break
+                    else:
+                        print(self.warn+"[!] Not valid choice: "+str(self.img_choice)+self.blk)
+                        self.img_choice = None
+                        continue
         except Exception as e:
             print(e)
       
@@ -220,10 +248,13 @@ class DigOcean(object):
              self.setToken()
              return
          
-         #Load access token 
-         self.doToken = os.environ['DOTOKEN']  
-         if not self.doToken:
-             print(self.fatal+"[Error]: Could not find access token"+self.blk)
+         #Load access token
+         try:
+             self.doToken = os.environ['DOTOKEN']  
+         except KeyError:
+             print(self.fatal+"[!] No access token found."
+                  +self.warn+"\nUse -t option to set token."
+                  +"\nIf token is already set try to run \"source ~/.bashrc\""+self.blk)
              if customArgs:
                  return
              else:
@@ -260,6 +291,7 @@ class DigOcean(object):
                  print(self.grn+"Droplet snapshotted successfully"+self.blk)
          elif self.args.restore:
              self.droplet = self.args.restore
+             print(self.warn+"Loading your images.."+self.blk)
              if self.restoreImage(self.droplet):
                  print(self.grn+"Droplet restored successfully"+self.blk)
          
